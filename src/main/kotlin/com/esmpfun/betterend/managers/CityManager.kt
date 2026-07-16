@@ -36,7 +36,7 @@ class CityManager(private val plugin: BetterEnd) {
         plugin.databaseManager.connection.use { conn ->
             conn.prepareStatement(
                 "SELECT id, world, min_x, min_y, min_z, max_x, max_y, max_z, " +
-                    "origin_x, origin_y, origin_z, created_at, last_reset, snapshot_file, loot_cycle_start FROM cities"
+                    "origin_x, origin_y, origin_z, created_at, last_reset, snapshot_file, loot_cycle_start, has_ship FROM cities"
             ).use { stmt ->
                 stmt.executeQuery().use { rs ->
                     while (rs.next()) {
@@ -54,6 +54,7 @@ class CityManager(private val plugin: BetterEnd) {
                             createdAt = rs.getLong("created_at"),
                             lastReset = rs.getLong("last_reset").takeIf { !rs.wasNull() },
                             snapshotFile = rs.getString("snapshot_file"),
+                            hasShip = rs.getInt("has_ship") != 0,
                         )
                         val cycle = rs.getLong("loot_cycle_start")
                         if (!rs.wasNull() && cycle > 0L) cycleStarts[id] = AtomicLong(cycle)
@@ -220,6 +221,29 @@ class CityManager(private val plugin: BetterEnd) {
             cache[id] = city.copy(lastReset = at)
         } catch (e: Exception) {
             plugin.logger.warning("[CityManager] setLastReset($id) failed: ${e.message}")
+        }
+    }
+
+    /**
+     * Marks a city as (not) containing a ship (DB + cache). Set true when the
+     * ship's unique dragon-head block is seen during snapshot capture, or when
+     * its elytra frame is first identified. Never flips back to false
+     * automatically — a harvested dragon head doesn't un-ship the city.
+     */
+    suspend fun setHasShip(id: Int, hasShip: Boolean) = withContext(Dispatchers.IO) {
+        val city = cache[id] ?: return@withContext
+        if (city.hasShip == hasShip) return@withContext
+        try {
+            plugin.databaseManager.connection.use { conn ->
+                conn.prepareStatement("UPDATE cities SET has_ship = ? WHERE id = ?").use { stmt ->
+                    stmt.setInt(1, if (hasShip) 1 else 0)
+                    stmt.setInt(2, id)
+                    stmt.executeUpdate()
+                }
+            }
+            cache[id] = city.copy(hasShip = hasShip)
+        } catch (e: Exception) {
+            plugin.logger.warning("[CityManager] setHasShip($id) failed: ${e.message}")
         }
     }
 

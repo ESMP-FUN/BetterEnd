@@ -112,6 +112,16 @@ class SnapshotManager(private val plugin: BetterEnd) {
             }
         }
 
+        // Ship fingerprint, for free: `end_city/ship` is the only end city
+        // template containing a dragon head (per the structure data in
+        // data/minecraft/structures/end_city), and we just read every piece
+        // block anyway. Wall + floor variants both serialize with a
+        // "dragon_head"/"dragon_wall_head" block id.
+        if (!city.hasShip && blocks.values.any { it.contains("dragon_head") || it.contains("dragon_wall_head") }) {
+            plugin.cityManager.setHasShip(city.id, true)
+            plugin.logger.info("[Snapshot] City #${city.id} contains an End Ship (dragon head found).")
+        }
+
         return withContext(Dispatchers.IO) {
             val data = SnapshotData(city.world, origin.first, origin.second, origin.third, blocks)
             val file = fileFor(city.id)

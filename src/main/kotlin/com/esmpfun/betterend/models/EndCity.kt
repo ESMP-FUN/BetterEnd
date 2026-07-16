@@ -25,6 +25,14 @@ data class EndCity(
     val createdAt: Long,
     val lastReset: Long? = null,
     val snapshotFile: String? = null,
+    /**
+     * True once a ship has been positively identified in this city. The ship
+     * is the `end_city/ship` template piece; since [org.bukkit.generator.structure.StructurePiece]
+     * exposes no piece names, we fingerprint it by its unique dragon-head
+     * block (no other end city template contains one) — detected during
+     * snapshot capture, or when the ship's elytra frame is first seen.
+     */
+    val hasShip: Boolean = false,
 ) {
     fun getWorld(): World? = Bukkit.getWorld(world)
 

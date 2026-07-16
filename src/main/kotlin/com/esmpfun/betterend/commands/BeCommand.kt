@@ -121,6 +121,7 @@ class BeCommand(private val plugin: BetterEnd) : BasicCommand {
                     "<click:run_command:'/betterend tp ${c.id}'><hover:show_text:'<gray>Teleport to city <white>#${c.id}'>" +
                     "<green>[${r.minX} ${r.minY} ${r.minZ}]</green></hover></click> " +
                     "<dark_gray>• ${c.pieces.size} pieces" +
+                    (if (c.hasShip) " <dark_gray>• <aqua>⛵ ship" else "") +
                     (if (plugin.snapshotManager.hasSnapshot(c.id)) " <dark_gray>• <gray>snapshot ✔" else "")
             ))
         }
@@ -133,6 +134,7 @@ class BeCommand(private val plugin: BetterEnd) : BasicCommand {
         sender.sendMessage("§7World: §f${city.world}")
         sender.sendMessage("§7Bounds: §f(${r.minX}, ${r.minY}, ${r.minZ}) §7→ §f(${r.maxX}, ${r.maxY}, ${r.maxZ})")
         sender.sendMessage("§7Pieces: §f${city.pieces.size}")
+        sender.sendMessage("§7End Ship: ${if (city.hasShip) "§byes ⛵" else "§7none found (ships are a 12.5% roll per bridge)"}")
         sender.sendMessage("§7Snapshot: ${if (plugin.snapshotManager.hasSnapshot(city.id)) "§acaptured" else "§enone — run /betterend snapshot ${city.id}"}")
         val cycle = plugin.cityManager.cycleStart(city.id)
         if (cycle > 0) {

@@ -162,6 +162,12 @@ class ElytraFrameListener(private val plugin: BetterEnd) : Listener {
         // player-placed tag above.)
         if (!StructureUtil.isNear(frame.location, Structure.END_CITY, 8.0)) return false
         frame.persistentDataContainer.set(frameTag, PersistentDataType.BYTE, 1)
+        // A ship elytra frame is proof of a ship — flag the city (belt &
+        // braces beside the snapshot capture's dragon-head fingerprint, e.g.
+        // when snapshot.auto-capture is off).
+        plugin.cityManager.getCachedCityAt(frame.location)?.takeIf { !it.hasShip }?.let { city ->
+            plugin.launchAsync { plugin.cityManager.setHasShip(city.id, true) }
+        }
         return true
     }
 
