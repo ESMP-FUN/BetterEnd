@@ -1,0 +1,31 @@
+.idea/
+out/
+.idea_modules/
+*.class
+*.log
+*.jar
+!gradle/wrapper/gradle-wrapper.jar
+*.war
+*.zip
+*.tar.gz
+*~
+.gradle
+build/
+**/build/
+gradle-app.setting
+.gradletasknamecache
+.kotlin/
+
+# Runtime / development artifacts
+run/
+database.db
+*.db
+nul
+
+# Saved reference pages (local research material)
+*.html
+*_files/
+
+# Local env / secrets
+.env
+.firecrawl/

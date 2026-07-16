@@ -1,0 +1,105 @@
+# BetterEnd configuration
+#
+# Everything in here can also be changed in-game: /betterend (menu) or
+# /betterend setup (guided tour). In-game changes are written back to this file.
+
+database:
+  # 'sqlite' (default, zero-setup) or 'mysql'
+  type: sqlite
+  # MySQL settings (ignored when type: sqlite)
+  mysql:
+    host: localhost
+    port: 3306
+    database: betterend
+    username: root
+    password: ""
+
+discovery:
+  # Auto-register naturally-generated End Cities as they load. Discovered
+  # cities are active immediately — loot, elytra frames and protection all
+  # start working without any manual step.
+  enabled: true
+  # Run a sweep over already-loaded chunks on plugin enable so cities resident
+  # at startup are caught without waiting for a ChunkLoadEvent.
+  startup-sweep: true
+  # Worlds where BetterEnd never registers cities (case-insensitive world
+  # names). Useful when a second end-type world has End Cities you want to
+  # leave vanilla. Cities already registered in a world BEFORE it was excluded
+  # keep working — remove them with /betterend delete <id>.
+  excluded-worlds: []
+
+elytra:
+  # The ship's elytra item frame becomes renewable: punch it and an elytra
+  # goes straight into your inventory, while the frame (and its elytra) stays
+  # for the next player. The frame itself is protected from breaking.
+  enabled: true
+  # Who can claim, how often:
+  #   per-ship    — each player can claim one elytra from each ship, ever
+  #   per-refresh — claims reset when that city's loot refresh window rolls over
+  #   global      — each player can claim one elytra total, across all ships
+  claim-mode: per-ship
+  cost:
+    # What a claim costs. Set the item in-game: /betterend menu → Elytra →
+    # "Choose cost item" (any item from your inventory, custom items included).
+    # Stored as a Base64 item stack; leave empty for free.
+    item: ""
+    # How many of the item a claim consumes. 0 = free.
+    amount: 0
+  # Float a small text hint above the ship's elytra frame (shows the cost, or
+  # "Punch to claim" when free).
+  text-display: true
+
+loot:
+  # Per-player container loot (Lootr-style). Each player gets their own private
+  # copy of a city container's contents; copies refresh per refresh-hours. Only
+  # containers inside the actual generated structure are treated as city loot —
+  # player-placed chests keep vanilla behaviour.
+  enabled: true
+  # Per-city loot refresh window, in hours. The first player to loot a city with
+  # no active (or an expired) cycle starts a fresh window for THAT city; when it
+  # elapses, the next looter triggers a refresh (all copies cleared) and a new
+  # window begins. Per-city + lazy, so cities never all refresh at once. 0 =
+  # never refresh (per-player copies persist indefinitely).
+  refresh-hours: 12
+
+protection:
+  # Griefing protection, bounds-based per structure piece. Any block inside a
+  # generated structure piece (towers, bridges, the ship) is protected
+  # regardless of type. The void BETWEEN pieces stays untouched.
+  enabled: true
+  # Blocks to expand each structure piece by, covering edge decoration and a
+  # thin shell around each tower. Small (~3) — this is per-piece, not whole-area.
+  piece-padding: 3
+  # Deny placing blocks inside a protected structure piece.
+  block-place: true
+  # Protect structure blocks from creeper/TNT/other explosions.
+  block-explosions: true
+  # Show an action-bar message when a break/place is denied.
+  notify-denied: true
+
+snapshot:
+  # Hard cap on how many block-cells a single city snapshot may capture, to
+  # protect memory on pathological structures. ~3M is far above a real city.
+  max-cells: 3000000
+  # Capture a baseline snapshot automatically when a city is discovered, so a
+  # reset target always exists without a manual /betterend snapshot.
+  auto-capture: true
+  # When a city's loot refresh cycle rolls over, also restore its blocks from
+  # the snapshot (reverts griefing). OFF by default: a restore rewrites blocks
+  # and can be disruptive if players are inside. Requires a snapshot.
+  auto-reset-on-refresh: false
+
+# Anonymous usage metrics (bStats). No player data is collected — just
+# aggregate config/feature usage that guides development priorities.
+# Server-wide opt-out also available in plugins/bStats/config.yml.
+metrics:
+  enabled: true
+
+setup:
+  # Set true automatically once the /betterend setup tour has been completed
+  # (or dismissed). Ops with betterend.admin get a one-time reminder on join
+  # while this is false.
+  completed: false
+
+debug:
+  verbose-logging: false

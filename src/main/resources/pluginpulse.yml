@@ -1,0 +1,14 @@
+# PluginPulse updater configuration.
+# https://github.com/darkstarworks/PluginPulse
+github: ESMP-FUN/BetterEnd
+
+permission: betterend.admin
+command-root: /betterend
+user-agent-contact: https://github.com/ESMP-FUN/BetterEnd
+prefix: "<light_purple>[BetterEnd]</light_purple>"
+
+# off | check-only | notify | download | auto-stage
+# Server owners can override this (and check-interval-hours) from an
+# `update:` section in BetterEnd's own config.yml.
+mode: notify
+check-interval-hours: 6
