@@ -20,11 +20,11 @@ import org.bstats.charts.SimplePie
 object MetricsService {
 
     /**
-     * bStats service id for BetterEnd — register the plugin at
-     * https://bstats.org/ and fill this in. A value <= 0 disables
-     * metrics init entirely (safe default until registered).
+     * bStats service id for BetterEnd, registered at
+     * https://bstats.org/plugin/bukkit/Better%20End/32676.
+     * A value <= 0 disables metrics init entirely.
      */
-    private const val BSTATS_SERVICE_ID: Int = 0
+    private const val BSTATS_SERVICE_ID: Int = 32676
 
     fun init(plugin: BetterEnd): String {
         if (BSTATS_SERVICE_ID <= 0) return "Disabled (no service id)"
