@@ -126,19 +126,27 @@ object BeDialogs {
             saveAndApply(view)
             player.closeDialog()
         }
-        val close = button("Close", NamedTextColor.RED, "Close without saving", null)
+        val close = closeButton(player, "Close", "Close without saving")
 
         val base = DialogBase.builder(Component.text(title, NamedTextColor.DARK_AQUA))
             .body(body.map { DialogBody.plainMessage(Component.text(it, NamedTextColor.GRAY)) })
             .inputs(inputs)
-            // Dialogs default to after_action CLOSE: every click closes the
-            // screen, the game re-grabs the mouse, THEN the next screen opens.
-            // NONE keeps the dialog up so Back/Save swap screen-to-screen.
+            // after_action defaults to CLOSE: every click would close the
+            // screen, the game would re-grab the mouse, THEN the next screen
+            // opens. NONE keeps the dialog up so Back/Save swap screen-to-
+            // screen — at the cost that a button with no action of its own
+            // does nothing at all (see closeButton).
+            //
             // pause defaults to true, and the server rejects a pausing dialog
-            // whose after-action leaves it paused. These screens navigate to
-            // each other (NONE keeps the dialog up so the handler can replace
-            // it), and a dedicated server never pauses anyway.
+            // whose after-action leaves it paused. A dedicated server never
+            // pauses anyway, so false is both correct and legal here.
+            //
+            // Escape-to-close is set explicitly rather than inherited: buttons
+            // are single-use (Adventure's default), so a callback that throws
+            // before it navigates would otherwise strand the player in a
+            // dialog whose buttons are already spent.
             .pause(false)
+            .canCloseWithEscape(true)
             .afterAction(DialogBase.DialogAfterAction.NONE)
             .build()
 
@@ -162,12 +170,29 @@ object BeDialogs {
             b.action(
                 DialogAction.customClick(
                     DialogActionCallback { view, _ -> onClick(view) },
+                    // Adventure defaults to uses = 1, which suits these
+                    // screens: every button either navigates (the next screen
+                    // is built fresh, with fresh callbacks) or closes, so no
+                    // button is legitimately clicked twice on one instance —
+                    // and single-use debounces double-clicks on Save for free.
                     ClickCallback.Options.builder().build(),
                 ),
             )
         }
         return b.build()
     }
+
+    /**
+     * An exit button.
+     *
+     * These dialogs use after-action NONE so navigation buttons can swap in
+     * the next screen instead of dismissing it. The consequence is that a
+     * button with no action does **nothing at all** — it can't fall back on
+     * the after-action to close. Every exit button must close the dialog
+     * itself, which is what this does.
+     */
+    fun closeButton(player: Player, label: String, tooltip: String): ActionButton =
+        button(label, NamedTextColor.RED, tooltip) { player.closeDialog() }
 
     // ── the /betterend menu ──────────────────────────────────────────────────
 
@@ -194,7 +219,7 @@ object BeDialogs {
                 if (player.isOnline) com.esmpfun.betterend.setup.SetupTour.start(plugin, player)
             })
         }
-        val close = button("Close", NamedTextColor.RED, "Close the menu", null)
+        val close = closeButton(player, "Close", "Close the menu")
 
         val costLine = if (cost == null) "Claims are currently free."
         else "A claim currently costs ${cost.amount} × ${cost.type.name.lowercase().replace('_', ' ')}."
@@ -209,11 +234,9 @@ object BeDialogs {
                     costLine,
                 ).map { DialogBody.plainMessage(Component.text(it, NamedTextColor.GRAY)) }
             )
-            // pause defaults to true, and the server rejects a pausing dialog
-            // whose after-action leaves it paused. These screens navigate to
-            // each other (NONE keeps the dialog up so the handler can replace
-            // it), and a dedicated server never pauses anyway.
+            // See showSettings for why these three are set explicitly.
             .pause(false)
+            .canCloseWithEscape(true)
             .afterAction(DialogBase.DialogAfterAction.NONE)
             .build()
 

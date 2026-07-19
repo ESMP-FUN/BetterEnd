@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog, and this project adheres to Semantic Versioning.
 
+## [0.2.3] - 2026-07-20
+### Fixed
+- **Every "close" button in the dialogs did nothing.** These screens stay open while you navigate between them, which means a button carries no implicit close — it has to close the dialog itself, and five of them had no action at all: **Close** on the main menu and on each settings screen, and **Close**, **Finish later** and **Done** in the setup tour. All five now close as labelled. "Finish later" still resumes on the step you left.
+
+### Changed
+- Dialogs now declare escape-to-close explicitly instead of inheriting the server default, so a screen can always be dismissed with Escape even if one of its buttons fails.
+
 ## [0.2.2] - 2026-07-20
 ### Fixed
 - **`/betterend` and `/betterend setup` threw instead of opening.** Both build dialogs that stay open while you navigate between screens, but left the dialog's `pause` flag at its default of `true`. The server rejects a pausing dialog whose after-action leaves it paused, so every screen failed with `Dialogs that pause the game must use after_action values that unpause it after user action`. All five dialogs now declare `pause(false)` — a dedicated server never pauses regardless.

@@ -178,7 +178,7 @@ object SetupTour {
             player.sendMessage(Component.text("Setup skipped — the defaults are live. /betterend reopens the menu anytime.", NamedTextColor.GRAY))
             player.closeDialog()
         }
-        val close = BeDialogs.button("Close", NamedTextColor.RED, "Ask me again next time", null)
+        val close = BeDialogs.closeButton(player, "Close", "Ask me again next time")
 
         val base = DialogBase.builder(Component.text("BetterEnd — first-time setup", NamedTextColor.DARK_AQUA))
             .body(
@@ -193,9 +193,9 @@ object SetupTour {
                     "Everything already works with the defaults.",
                 ).map { DialogBody.plainMessage(Component.text(it, NamedTextColor.GRAY)) }
             )
-            // See BeDialogs: a pausing dialog may not use an after-action that
-            // leaves it paused, and the tour navigates between its own screens.
+            // See BeDialogs.showSettings for why these three are set explicitly.
             .pause(false)
+            .canCloseWithEscape(true)
             .afterAction(DialogBase.DialogAfterAction.NONE)
             .build()
 
@@ -237,16 +237,16 @@ object SetupTour {
                 plugin.scheduler.runAtEntity(player, Runnable { if (player.isOnline) openStep(plugin, player, index + 1) })
             }
         }
-        val finishLater = BeDialogs.button("Finish later", NamedTextColor.RED, "Close the tour — /betterend setup resumes right here", null)
+        val finishLater = BeDialogs.closeButton(player, "Finish later", "Close the tour — /betterend setup resumes right here")
 
         val base = DialogBase.builder(
             Component.text("Setup (${index + 1}/${steps.size}) — ${step.title}", NamedTextColor.DARK_AQUA)
         )
             .body(step.body.map { DialogBody.plainMessage(Component.text(it, NamedTextColor.GRAY)) })
             .inputs(step.inputs(plugin))
-            // See BeDialogs: a pausing dialog may not use an after-action that
-            // leaves it paused, and the tour navigates between its own screens.
+            // See BeDialogs.showSettings for why these three are set explicitly.
             .pause(false)
+            .canCloseWithEscape(true)
             .afterAction(DialogBase.DialogAfterAction.NONE)
             .build()
 
@@ -264,7 +264,7 @@ object SetupTour {
             player.closeDialog()
             plugin.scheduler.runAtEntity(player, Runnable { if (player.isOnline) CurrencyPickerView(plugin).open(player) })
         }
-        val close = BeDialogs.button("Done", NamedTextColor.RED, "Close — happy flying!", null)
+        val close = BeDialogs.closeButton(player, "Done", "Close — happy flying!")
 
         val costLine = if (cost == null) "Claims are free" else "A claim costs ${cost.amount} × ${cost.type.name.lowercase().replace('_', ' ')}"
         val base = DialogBase.builder(Component.text("Setup complete ✔", NamedTextColor.DARK_AQUA))
@@ -279,9 +279,9 @@ object SetupTour {
                     "Change any of it later with /betterend.",
                 ).map { DialogBody.plainMessage(Component.text(it, NamedTextColor.GRAY)) }
             )
-            // See BeDialogs: a pausing dialog may not use an after-action that
-            // leaves it paused, and the tour navigates between its own screens.
+            // See BeDialogs.showSettings for why these three are set explicitly.
             .pause(false)
+            .canCloseWithEscape(true)
             .afterAction(DialogBase.DialogAfterAction.NONE)
             .build()
 
