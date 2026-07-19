@@ -134,6 +134,11 @@ object BeDialogs {
             // Dialogs default to after_action CLOSE: every click closes the
             // screen, the game re-grabs the mouse, THEN the next screen opens.
             // NONE keeps the dialog up so Back/Save swap screen-to-screen.
+            // pause defaults to true, and the server rejects a pausing dialog
+            // whose after-action leaves it paused. These screens navigate to
+            // each other (NONE keeps the dialog up so the handler can replace
+            // it), and a dedicated server never pauses anyway.
+            .pause(false)
             .afterAction(DialogBase.DialogAfterAction.NONE)
             .build()
 
@@ -204,6 +209,11 @@ object BeDialogs {
                     costLine,
                 ).map { DialogBody.plainMessage(Component.text(it, NamedTextColor.GRAY)) }
             )
+            // pause defaults to true, and the server rejects a pausing dialog
+            // whose after-action leaves it paused. These screens navigate to
+            // each other (NONE keeps the dialog up so the handler can replace
+            // it), and a dedicated server never pauses anyway.
+            .pause(false)
             .afterAction(DialogBase.DialogAfterAction.NONE)
             .build()
 

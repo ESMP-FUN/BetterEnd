@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog, and this project adheres to Semantic Versioning.
 
+## [0.2.2] - 2026-07-20
+### Fixed
+- **`/betterend` and `/betterend setup` threw instead of opening.** Both build dialogs that stay open while you navigate between screens, but left the dialog's `pause` flag at its default of `true`. The server rejects a pausing dialog whose after-action leaves it paused, so every screen failed with `Dialogs that pause the game must use after_action values that unpause it after user action`. All five dialogs now declare `pause(false)` — a dedicated server never pauses regardless.
+
 ## [0.2.1] - 2026-07-20
 ### Fixed
 - **BetterEnd did nothing on 0.1.0 and 0.2.0.** `/betterend` was registered from a scheduled task rather than during plugin enable. Paper only accepts command registration while a plugin is enabling, so it always threw `Cannot register lifecycle event handlers` — which aborted the rest of startup, leaving the ready flag unset. Every listener checks that flag, so elytra claims, per-player loot, protection and city discovery were all silently inactive, and update checking and metrics never started. The command is now registered inside `onEnable` where Paper expects it. **Updating from 0.1.0 or 0.2.0 requires no config changes — the plugin simply starts working.**

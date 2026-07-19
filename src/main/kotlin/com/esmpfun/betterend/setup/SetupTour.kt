@@ -193,6 +193,9 @@ object SetupTour {
                     "Everything already works with the defaults.",
                 ).map { DialogBody.plainMessage(Component.text(it, NamedTextColor.GRAY)) }
             )
+            // See BeDialogs: a pausing dialog may not use an after-action that
+            // leaves it paused, and the tour navigates between its own screens.
+            .pause(false)
             .afterAction(DialogBase.DialogAfterAction.NONE)
             .build()
 
@@ -241,6 +244,9 @@ object SetupTour {
         )
             .body(step.body.map { DialogBody.plainMessage(Component.text(it, NamedTextColor.GRAY)) })
             .inputs(step.inputs(plugin))
+            // See BeDialogs: a pausing dialog may not use an after-action that
+            // leaves it paused, and the tour navigates between its own screens.
+            .pause(false)
             .afterAction(DialogBase.DialogAfterAction.NONE)
             .build()
 
@@ -273,6 +279,9 @@ object SetupTour {
                     "Change any of it later with /betterend.",
                 ).map { DialogBody.plainMessage(Component.text(it, NamedTextColor.GRAY)) }
             )
+            // See BeDialogs: a pausing dialog may not use an after-action that
+            // leaves it paused, and the tour navigates between its own screens.
+            .pause(false)
             .afterAction(DialogBase.DialogAfterAction.NONE)
             .build()
 
