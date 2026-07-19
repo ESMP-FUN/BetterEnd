@@ -89,9 +89,11 @@ snapshot:
   # and can be disruptive if players are inside. Requires a snapshot.
   auto-reset-on-refresh: false
 
-# Anonymous usage metrics (bStats). No player data is collected — just
+# Anonymous usage metrics (FastStats). No player data is collected — just
 # aggregate config/feature usage that guides development priorities.
-# Server-wide opt-out also available in plugins/bStats/config.yml.
+# Server-wide opt-out also available in plugins/faststats/config.properties
+# (enabled=false). That file is written on first start and nothing is sent
+# until the following restart, so opting out first is always possible.
 metrics:
   enabled: true
 

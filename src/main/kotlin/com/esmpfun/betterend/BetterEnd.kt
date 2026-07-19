@@ -115,9 +115,9 @@ class BetterEnd : JavaPlugin() {
                     // block in config.yml.
                     io.github.darkstarworks.pluginpulse.PluginPulse.bootstrap(this@BetterEnd)
 
-                    // Anonymous usage metrics (bStats). Opt-out via metrics.enabled
-                    // in config.yml or the global plugins/bStats/config.yml.
-                    logger.info("bStats Metrics: ${MetricsService.init(this@BetterEnd)}")
+                    // Anonymous usage metrics (FastStats). Opt-out via metrics.enabled
+                    // in config.yml or the global plugins/FastStats/config.yml.
+                    logger.info("FastStats Metrics: ${MetricsService.init(this@BetterEnd)}")
 
                     isReady = true
                     logger.info("BetterEnd ready.")
@@ -135,6 +135,7 @@ class BetterEnd : JavaPlugin() {
     override fun onDisable() {
         isReady = false
         io.github.darkstarworks.pluginpulse.PluginPulse.shutdown(this)
+        MetricsService.shutdown()
         scheduler.cancelAllTasks()
         pluginScope.cancel()
         if (::databaseManager.isInitialized) databaseManager.close()

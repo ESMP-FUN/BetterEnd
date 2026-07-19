@@ -12,6 +12,9 @@ repositories {
         name = "papermc-repo"
     }
     maven("https://jitpack.io")
+    maven("https://repo.faststats.dev/releases") {
+        name = "faststatsReleases"
+    }
 }
 
 dependencies {
@@ -34,8 +37,8 @@ dependencies {
     // PluginPulse — update checking + verified install staging.
     implementation("com.github.darkstarworks.PluginPulse:pluginpulse-core:v0.8.0")
 
-    // Anonymous usage metrics (relocated below — bStats requires it)
-    implementation("org.bstats:bstats-bukkit:3.2.1")
+    // Anonymous usage metrics (relocated below)
+    implementation("dev.faststats.metrics:bukkit:0.28.0")
 
     // Testing
     testImplementation("org.junit.jupiter:junit-jupiter:5.10.1")
@@ -57,8 +60,11 @@ tasks {
         // plugins' shaded copies.
         relocate("com.zaxxer.hikari", "com.esmpfun.betterend.hikari")
         relocate("io.github.darkstarworks.pluginpulse", "com.esmpfun.betterend.pluginpulse")
-        // bStats mandates relocation so multiple plugins can shade different versions
-        relocate("org.bstats", "com.esmpfun.betterend.bstats")
+        // Relocated so multiple plugins can shade different FastStats versions.
+        // Do NOT relocate com.google.gson: FastStats declares it as provided and
+        // resolves it from the platform (Paper bundles gson), so it is never
+        // shaded here — rewriting those references would break at runtime.
+        relocate("dev.faststats", "com.esmpfun.betterend.faststats")
         // Do NOT relocate org.sqlite (JNI native loading) or the MySQL driver
         // (driverClassName references its real package name at runtime).
         mergeServiceFiles()
@@ -68,6 +74,11 @@ tasks {
         exclude("META-INF/*.SF")
         exclude("META-INF/*.DSA")
         exclude("META-INF/*.RSA")
+
+        // The FastStats/gson jars are JPMS modules; a merged module-info in a
+        // shaded plugin jar is meaningless and trips some class scanners.
+        exclude("module-info.class")
+        exclude("META-INF/versions/*/module-info.class")
 
         // Trim SQLite natives to the platforms a MC server actually runs on.
         exclude("org/sqlite/native/FreeBSD/**")
