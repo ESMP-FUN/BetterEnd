@@ -29,6 +29,3 @@ nul
 # Local env / secrets
 .env
 .firecrawl/
-
-# Wiki text extractions (local research material)
-End_City_*.txt
