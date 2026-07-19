@@ -83,14 +83,24 @@ class BetterEnd : JavaPlugin() {
         logger.info("BetterEnd starting on ${if (scheduler.isFolia) "Folia" else "Paper"}...")
 
         // Async-first init: heavy setup (DB, caches, discovery sweep) runs off
-        // the main thread; listeners/commands register on the main thread once
-        // ready.
+        // the main thread; listeners register on the main thread once ready.
         databaseManager = DatabaseManager(this)
         cityManager = CityManager(this)
         discoveryManager = CityDiscoveryManager(this)
         containerLootManager = ContainerLootManager(this)
         elytraClaimManager = ElytraClaimManager(this)
         snapshotManager = SnapshotManager(this)
+
+        // Commands MUST be registered synchronously inside onEnable: Paper backs
+        // registerCommand with a lifecycle event handler, and the lifecycle
+        // manager stops accepting handlers the moment enable returns. Doing this
+        // from a scheduled task throws "Cannot register lifecycle event handlers"
+        // and, because it aborts the rest of that task, leaves isReady false —
+        // which silently disables every listener too. Registered after the
+        // managers above so tab-completion always has them; BeCommand guards on
+        // isReady for anything that needs the database.
+        @Suppress("UnstableApiUsage")
+        registerCommand("betterend", "BetterEnd admin command & config menu", BeCommand(this))
 
         launchAsync {
             try {
@@ -106,21 +116,22 @@ class BetterEnd : JavaPlugin() {
                     // Central GUI dispatcher — routes only BaseHolder inventories.
                     server.pluginManager.registerEvents(VcGuiListener(), this@BetterEnd)
 
-                    // Paper plugins register commands in code, not via paper-plugin.yml.
-                    @Suppress("UnstableApiUsage")
-                    registerCommand("betterend", "BetterEnd admin command & config menu", BeCommand(this@BetterEnd))
+                    // Core setup is done — flip the flag BEFORE the optional
+                    // integrations below. Every listener guards on isReady, so a
+                    // throw from an add-on must never leave the plugin inert.
+                    isReady = true
+                    logger.info("BetterEnd ready.")
 
                     // Update checking (PluginPulse). Config in pluginpulse.yml;
                     // server owners can override mode/interval via an `update:`
                     // block in config.yml.
-                    io.github.darkstarworks.pluginpulse.PluginPulse.bootstrap(this@BetterEnd)
+                    runCatching {
+                        io.github.darkstarworks.pluginpulse.PluginPulse.bootstrap(this@BetterEnd)
+                    }.onFailure { logger.warning("Update checking unavailable: ${it.message}") }
 
                     // Anonymous usage metrics (FastStats). Opt-out via metrics.enabled
                     // in config.yml or the global plugins/FastStats/config.yml.
                     logger.info("FastStats Metrics: ${MetricsService.init(this@BetterEnd)}")
-
-                    isReady = true
-                    logger.info("BetterEnd ready.")
                     // Catch cities in chunks already resident at enable (the live
                     // ChunkLoadEvent covers everything loaded afterward).
                     discoveryManager.startupSweep()

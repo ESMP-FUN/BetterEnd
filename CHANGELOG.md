@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog, and this project adheres to Semantic Versioning.
 
+## [0.2.1] - 2026-07-20
+### Fixed
+- **BetterEnd did nothing on 0.1.0 and 0.2.0.** `/betterend` was registered from a scheduled task rather than during plugin enable. Paper only accepts command registration while a plugin is enabling, so it always threw `Cannot register lifecycle event handlers` — which aborted the rest of startup, leaving the ready flag unset. Every listener checks that flag, so elytra claims, per-player loot, protection and city discovery were all silently inactive, and update checking and metrics never started. The command is now registered inside `onEnable` where Paper expects it. **Updating from 0.1.0 or 0.2.0 requires no config changes — the plugin simply starts working.**
+- Startup no longer depends on optional integrations: the ready flag is set before update checking and metrics initialise, and a failure in either is logged instead of disabling the plugin.
+
 ## [0.2.0] - 2026-07-19
 ### Changed
 - **Usage metrics moved from bStats to FastStats.** No player data is collected, and the opt-out in `config.yml` (`metrics.enabled`) is unchanged. The server-wide opt-out file is now `plugins/faststats/config.properties` (`enabled=false`) instead of `plugins/bStats/config.yml`; nothing is submitted until the restart after that file is first written, so admins can always opt out before any data leaves the server.
