@@ -47,9 +47,11 @@ Watch the console:
 [BetterEnd] BetterEnd starting on Paper...
 [BetterEnd] Database pool initialized (SQLITE)
 [BetterEnd] Loaded 0 End Cities into cache
-[BetterEnd] FastStats Metrics: Enabled
 [BetterEnd] BetterEnd ready.
+[BetterEnd] FastStats Metrics: Enabled
 ```
+
+`BetterEnd ready.` deliberately comes before the metrics line — the plugin is fully operational at that point, and the optional integrations start after it.
 
 `Loaded 0 End Cities` is correct on a first start — cities register themselves as players travel, not up front.
 
